@@ -1,0 +1,38 @@
+.uns-aov-btn {
+    position: absolute;
+    z-index: 999;
+    bottom: 8vh;
+    width: 100px;
+    height: 50px;
+    background-color: rgba(255, 255, 255, 0.75);
+    color: black;
+    border-radius: 5px;
+    border: 0;
+    cursor: pointer; 
+}
+
+.selected-aov-btn {
+    position: absolute;
+    z-index: 999;
+    bottom: 8vh;
+    background: linear-gradient(to right, rgb(20, 64, 176), rgb(9, 37, 92));
+    color: white;
+    width: 100px;
+    height: 50px;
+    border-radius: 5px;
+    border: 1px solid white;
+    cursor: pointer; 
+}
+
+.selected-aov-btn-g {
+    position: absolute;
+    z-index: 999;
+    bottom: 8vh;
+    background: linear-gradient(to right, rgb(5, 73, 102), rgb(3, 31, 46));
+    color: white;
+    width: 100px;
+    height: 50px;
+    border-radius: 5px;
+    border: 1px solid white;
+    cursor: pointer; 
+}
