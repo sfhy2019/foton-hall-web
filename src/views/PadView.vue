@@ -215,7 +215,7 @@ const stream_height = 1080;
 
 const host_ros_http = "http://192.168.1.139:8080"
 const host_ros_http1 = "http://192.168.1.139:8000"
-const host_ros_socket = "ws://192.168.1.139:9090"
+const host_ros_socket = "ws://192.168.1.139:9090";
 
 export default {
   name: "TargetDetection",
