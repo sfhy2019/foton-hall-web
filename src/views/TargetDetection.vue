@@ -202,7 +202,17 @@
       >
         <div
           @click="showMode = !showMode"
-          style="color: white; border: 1px solid white; padding: 5px;cursor: pointer;background: linear-gradient(to right, rgb(67, 67, 67), rgb(0, 0, 0));"
+          style="
+            color: white;
+            border: 1px solid white;
+            padding: 5px;
+            cursor: pointer;
+            background: linear-gradient(
+              to right,
+              rgb(67, 67, 67),
+              rgb(0, 0, 0)
+            );
+          "
         >
           Change Mode
         </div>
@@ -224,7 +234,11 @@
       :show="showEnhanceModal"
       @close="showEnhanceModal = false"
     ></Modal>
-    <input-modal :show="inputModalShow" @close="inputModalShow = false" @submit="submitRequest"></input-modal>
+    <input-modal
+      :show="inputModalShow"
+      @close="inputModalShow = false"
+      @submit="submitRequest"
+    ></input-modal>
   </div>
 </template>
 
@@ -303,7 +317,7 @@ export default {
       train_tip_middle: this.$t("TargetDetection.Tip7"),
 
       //
-      inputModalShow: false
+      inputModalShow: false,
     };
   },
   computed: {},
@@ -688,12 +702,11 @@ export default {
     async confirmCutedData() {
       console.log("confirm..");
 
-      this.inputModalShow = true
+      this.inputModalShow = true;
     },
-    async submitRequest(tagName){
+    async submitRequest(tagName) {
+      console.log(tagName);
 
-      console.log(tagName)
-      
       let cut_preview_obj_1 = this.cut_preview_data[0];
       let cut_preview_obj_2 = this.cut_preview_data[1];
       let formData = new FormData();
@@ -882,7 +895,7 @@ export default {
   border: 2px solid white;
   border-radius: 5px;
   background: rgb(28, 89, 92);
-  cursor: pointer; 
+  cursor: pointer;
 }
 
 .el_cls_train_slider {
@@ -946,7 +959,7 @@ export default {
   justify-content: center;
   align-items: center;
   background-image: url("/assets/button2.png");
-  cursor: pointer; 
+  cursor: pointer;
 }
 .el_cls_preview_cut {
   width: 100%;

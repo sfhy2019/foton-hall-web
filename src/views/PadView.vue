@@ -194,6 +194,11 @@
       :show="showEnhanceModal"
       @close="showEnhanceModal = false"
     ></Modal>
+    <input-modal
+      :show="inputModalShow"
+      @close="inputModalShow = false"
+      @submit="submitRequest"
+    ></input-modal>
   </div>
 </template>
 
@@ -202,6 +207,7 @@ import Annotation2DHandler from "../js/Annotation2DHandler";
 import ROSLIB from "roslib/src/RosLib";
 import { base64ToUint8Array } from "../js/utils";
 import Modal from "../components/Modal.vue";
+import InputModal from "../components/InputModal.vue";
 
 const stream_quality = 50;
 const stream_width = 1920;
@@ -270,7 +276,10 @@ export default {
       lastIndex: 0,
 
       //
-      train_tip_middle : this.$t("TargetDetection.Tip7") 
+      train_tip_middle : this.$t("TargetDetection.Tip7"),
+
+      //
+      inputModalShow: false,
     };
   },
   computed: {},
@@ -393,6 +402,7 @@ export default {
   },
   components: {
     Modal,
+    InputModal
   },
   methods: {
     ros_subscribe() {
@@ -666,6 +676,12 @@ export default {
     // },
     async confirmCutedData() {
       console.log("confirm..");
+
+      this.inputModalShow = true;
+
+    },
+    async submitRequest(tagName){
+      console.log(tagName);
 
       let cut_preview_obj_1 = this.cut_preview_data[0];
       let cut_preview_obj_2 = this.cut_preview_data[1];
