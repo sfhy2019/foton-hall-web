@@ -31,9 +31,9 @@ import screenTexture from "/assets/screen-1.png";
 
 let human_models = [
   {
-    path: "/assets/male_1.glb",
-    an_walk_clip_name: "walk",
-    an_idle_clip_name: "walk",
+    path: "/assets/gltfs/male_2_new(2).glb",
+    an_walk_clip_name: "Rig|man_idle",
+    an_idle_clip_name: "Rig|man_idle",
     model_origin_rotate_x: Math.PI / 2,
     model_origin_rotate_y: Math.PI / 2,
     obstract_human_model: null, //在加载完毕后赋值
@@ -49,18 +49,18 @@ export default {
   components: {},
   watch: {
     gltf_loaded_count(value) {
-      console.log(value)
+      console.log(value);
       if (value == human_models.length) {
         const THIS = this;
         //话题message
         this.r_fusion_listner.subscribe(function (message) {
-          console.log(message)
+          console.log(message);
           // const now = new Date();
           // const milliseconds = now.getTime();
           // console.log(milliseconds);
           THIS.updateObstracleToScene(message);
         });
-        this.resetCameraView(0)
+        this.resetCameraView(0);
       }
     },
   },
@@ -86,14 +86,39 @@ export default {
       ],
       //三视图相机坐标
       aovPointList: [
-        new THREE.Vector3(0.04863317975457897,-4.637427658825402, 1.9364927503943365),
-        new THREE.Vector3(0.1604982648090563, 0.12374679350199147, 11.472517101296571),
-        new THREE.Vector3(-5.775984515479597, 0.13267900462905732, 1.4288224252425863),
+        new THREE.Vector3(
+          0.04863317975457897,
+          -4.637427658825402,
+          1.9364927503943365
+        ),
+        new THREE.Vector3(
+          0.1604982648090563,
+          0.12374679350199147,
+          11.472517101296571
+        ),
+        new THREE.Vector3(
+          -5.775984515479597,
+          0.13267900462905732,
+          1.4288224252425863
+        ),
       ],
       aovDirectionList: [
-        new THREE.Vector3(0.03702500503275326, -3.6376242617817094, 1.9204173798065598),
-        new THREE.Vector3(0.160523643512375, 0.13941592302534198,0.08729195868031897, 10.472639869964693),
-        new THREE.Vector3(-4.777613178262525, 0.1584434252814009, 1.3779218589211244),
+        new THREE.Vector3(
+          0.03702500503275326,
+          -3.6376242617817094,
+          1.9204173798065598
+        ),
+        new THREE.Vector3(
+          0.160523643512375,
+          0.13941592302534198,
+          0.08729195868031897,
+          10.472639869964693
+        ),
+        new THREE.Vector3(
+          -4.777613178262525,
+          0.1584434252814009,
+          1.3779218589211244
+        ),
       ],
       //3dbox信息集合 id : 3dbox
       threeDboxes: {},
@@ -135,11 +160,11 @@ export default {
     ros_unsubscribe() {
       if (this.r_fusion_listner) this.r_fusion_listner.unsubscribe();
     },
-    resetCameraView(index){
+    resetCameraView(index) {
       const target_v = this.aovPointList[index];
-      const target_l = this.aovDirectionList[index]
+      const target_l = this.aovDirectionList[index];
       this.t_camera.position.set(target_v.x, target_v.y, target_v.z);
-      this.t_camera.lookAt(target_l.x,target_l.y,target_l.z)
+      this.t_camera.lookAt(target_l.x, target_l.y, target_l.z);
       this.t_camera.updateProjectionMatrix();
     },
     /**
@@ -148,9 +173,11 @@ export default {
      * @param {Boolean} isNew - 是否是新建的人物
      * @param {Object3D} obj - 人物模型
      * @param {Vector3} target_position - 即将到达的位置
+     * @param {Float} theta - 转向角
+     * @param {Float} height - 人物高度
      * @returns void
      */
-    updateObstracleState(isNew, obj, target_position, theta) {
+    updateObstracleState(isNew, obj, target_position, theta, height) {
       const min_walk_threshold = 0.05; //最小移动阈值，单位米
       const target_human_info = human_models[obj.index_of_models];
       const target_gltf = target_human_info.obstract_human_gltf;
@@ -196,6 +223,12 @@ export default {
           obj.rotation.y = target_human_info.model_origin_rotate_y + theta; //朝向
           obj.position.set(target_position.x, target_position.y, 0); //位置
         }
+        //** 这里为了防止模型变形，三个轴的缩放全部用高度比作为比例，长宽高都用这个比例缩放 */
+        let scale_value = parseFloat(
+          height / target_human_info.height
+        );
+        obj.scale.set(scale_value, scale_value, scale_value);
+        //** 这里为了防止模型变形，三个轴的缩放全部用高度比作为比例，长宽高都用这个比例缩放 */
       }
     },
     updateObstracleToScene(message) {
@@ -215,8 +248,8 @@ export default {
           if (exist == false) {
             //新的这一帧里没这个了
             t_scene.remove(obj);
-            if(obj.material) obj.material.dispose()
-            if(obj.geometry) obj.geometry.dispose()
+            if (obj.material) obj.material.dispose();
+            if (obj.geometry) obj.geometry.dispose();
           }
         }
       }
@@ -234,7 +267,8 @@ export default {
               false,
               obj,
               obstacle.position,
-              obstacle.theta
+              obstacle.theta,
+              obstacle.height
             );
             break;
           }
@@ -248,18 +282,18 @@ export default {
             true,
             obstacle_mesh,
             obstacle.position,
-            obstacle.theta
+            obstacle.theta,
+            obstacle.height
           );
           t_scene.add(obstacle_mesh);
         }
       }
     },
     clickAOV(index) {
-      this.resetCameraView(index)
+      this.resetCameraView(index);
       this.selectedAovIndex = index;
     },
     three_init() {
-      
       this.pcd_canvas_width = this.$refs.el_ref_pcd_box.offsetWidth;
       this.pcd_canvas_height = this.$refs.el_ref_pcd_box.offsetHeight;
       t_scene = new THREE.Scene();
@@ -269,12 +303,12 @@ export default {
         1,
         1000
       );
-      
+
       this.t_camera.up = new THREE.Vector3(0, 0, 1).normalize();
       this.t_renderer = new THREE.WebGLRenderer({ antialias: true });
       this.t_renderer.setSize(this.pcd_canvas_width, this.pcd_canvas_height);
       this.t_camera.aspect = this.pcd_canvas_width / window.innerHeight;
-      this.resetCameraView(0)
+      this.resetCameraView(0);
 
       this.$refs.el_ref_pcd_box.appendChild(this.t_renderer.domElement);
       // 轨道控制器
@@ -283,14 +317,14 @@ export default {
         this.t_renderer.domElement
       );
       this.t_orbitControl.update();
-      const THIS = this
+      const THIS = this;
       this.t_orbitControl.addEventListener("change", () => {
-         console.log(THIS.t_camera.position)
-         const direction = new THREE.Vector3()
-         THIS.t_camera.getWorldDirection(direction)
-         const lookAtPosition = new THREE.Vector3()
-         lookAtPosition.addVectors(THIS.t_camera.position,direction)
-         console.log(lookAtPosition)
+        console.log(THIS.t_camera.position);
+        const direction = new THREE.Vector3();
+        THIS.t_camera.getWorldDirection(direction);
+        const lookAtPosition = new THREE.Vector3();
+        lookAtPosition.addVectors(THIS.t_camera.position, direction);
+        console.log(lookAtPosition);
       });
       //
       // const axesHelper = new THREE.AxesHelper(2);
@@ -468,13 +502,13 @@ export default {
         let i = 0; //测试用游标
         model.traverse(function (node) {
           if (node.material) {
-            console.log(i)
+            console.log(i);
             console.log(node.material.name);
             if (
               // node.material.name == "light_shell.002" ||
               node.material.name == "wall_hall.001" ||
-              node.material.name == "door_glass.001"||
-              node.material.name == "metal.001"||
+              node.material.name == "door_glass.001" ||
+              node.material.name == "metal.001" ||
               node.material.name == "light_shine.001"
             ) {
               node.material.transparent = true;
@@ -482,7 +516,7 @@ export default {
               node.material.needsUpdate = true;
             }
           }
-          
+
           i++;
         });
         t_scene.add(model);
@@ -512,7 +546,7 @@ export default {
           human_models[i].obstract_human_model = model;
           human_models[i].obstract_human_gltf = gltf;
           THIS.gltf_loaded_count += 1;
-          // t_scene.add(model)
+          t_scene.add(model);
         });
       }
 
@@ -530,8 +564,8 @@ export default {
         });
         model.rotateX(Math.PI / 2);
         //** test/
-        model.position.set(2,0.25,0)
-        model.scale.set(0.8,0.8,0.8)
+        model.position.set(2, 0.25, 0);
+        model.scale.set(0.8, 0.8, 0.8);
         //** test/
         // t_scene.add(model);
       });
@@ -563,6 +597,7 @@ export default {
         obstacle_info.height / human_models[target_index].height
       );
       new_mesh.scale.set(scale_value, scale_value, scale_value);
+      //** 这里为了防止模型变形，三个轴的缩放全部用高度比作为比例，长宽高都用这个比例缩放 */
 
       return new_mesh;
     },
@@ -596,6 +631,5 @@ export default {
   margin-top: 2.5vh;
   height: 83vh;
 }
-
 </style>
       
